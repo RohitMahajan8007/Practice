@@ -11,6 +11,7 @@ const Product = () => {
 
     const [products, setProducts] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [errors, setErrors] = useState({});
 
     const [formData, setFormData] = useState({
         title: "",
@@ -33,14 +34,48 @@ const Product = () => {
     }, []);
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
+
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
+
+        setErrors((prev) => ({
+            ...prev,
+            [name]: "",
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const newErrors = {};
+
+        if (!formData.title.trim()) {
+            newErrors.title = "Title is required";
+        }
+
+        if (!formData.discription.trim()) {
+            newErrors.discription = "Description is required";
+        }
+
+        if (!formData.price) {
+            newErrors.price = "Price is required";
+        } else if (Number(formData.price) <= 0) {
+            newErrors.price = "Price must be greater than 0";
+        }
+
+        if (!formData.category.trim()) {
+            newErrors.category = "Category is required";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        setErrors({});
 
         try {
             const productData = {
@@ -78,6 +113,8 @@ const Product = () => {
                 price: "",
                 category: "",
             });
+
+            setErrors({});
         } catch (error) {
             console.error(error.response?.data || error);
         }
@@ -127,7 +164,7 @@ const Product = () => {
     return (
         <div className="min-h-screen bg-gray-100 p-6">
             <div className="max-w-6xl mx-auto">
-                {/* Form */}
+
                 <div className="bg-white p-6 rounded-lg shadow-md mb-8">
                     <h2 className="text-2xl font-bold mb-4">
                         {editingId
@@ -137,6 +174,7 @@ const Product = () => {
 
                     <form
                         onSubmit={handleSubmit}
+                        noValidate
                         className="space-y-4"
                     >
                         <input
@@ -145,29 +183,49 @@ const Product = () => {
                             placeholder="Product Title"
                             value={formData.title}
                             onChange={handleChange}
-                            className="w-full border p-3 rounded-lg"
-                            required
+                            className={`w-full border p-3 rounded-lg ${errors.title
+                                ? "border-red-500"
+                                : "border-gray-300"
+                                }`}
                         />
-
+                        {errors.title && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.title}
+                            </p>
+                        )}
                         <textarea
                             name="discription"
                             placeholder="Product Description"
                             value={formData.discription}
                             onChange={handleChange}
-                            className="w-full border p-3 rounded-lg"
+                            className={`w-full border p-3 rounded-lg ${errors.discription
+                                ? "border-red-500"
+                                : "border-gray-300"
+                                }`}
                             rows="4"
-                            required
                         />
-
+                        {errors.discription && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.discription}
+                            </p>
+                        )}
                         <input
                             type="number"
                             name="price"
                             placeholder="Product Price"
                             value={formData.price}
                             onChange={handleChange}
-                            className="w-full border p-3 rounded-lg"
-                            required
+                            className={`w-full border p-3 rounded-lg ${errors.price
+                                ? "border-red-500"
+                                : "border-gray-300"
+                                }`}
                         />
+
+                        {errors.price && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.price}
+                            </p>
+                        )}
 
                         <input
                             type="text"
@@ -175,10 +233,16 @@ const Product = () => {
                             placeholder="Category"
                             value={formData.category}
                             onChange={handleChange}
-                            className="w-full border p-3 rounded-lg"
-                            required
+                            className={`w-full border p-3 rounded-lg ${errors.category
+                                ? "border-red-500"
+                                : "border-gray-300"
+                                }`}
                         />
-
+                        {errors.category && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.category}
+                            </p>
+                        )}
                         <div className="flex gap-3">
                             <button
                                 type="submit"
