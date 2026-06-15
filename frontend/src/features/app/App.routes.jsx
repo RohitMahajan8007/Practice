@@ -1,32 +1,43 @@
 import { createBrowserRouter } from "react-router";
 import Register from "../auth/Pages/Register.jsx";
 import Login from "../auth/Pages/Login.jsx";
-import Protected from "../auth/Components/Protected.jsx";
+import Product from "../products/Pages/Product.jsx";
+import Protected, { Public } from "../auth/Components/Protected.jsx";
 
 export const Route = createBrowserRouter([
-   {
+  {
     path: "/",
     element: (
-       
-            <h1>Hello</h1>
-     
-    )
-},
+      <Protected>
+        <Product />
+      </Protected>
+    ),
+  },
 
-    {
-        path: "/register",
-        element: (
+  {
+    path: "/products",
+    element: (
+      <Protected>
+        <Product />
+      </Protected>
+    ),
+  },
 
-                <Register />
-       
-        )
-    },
+  {
+    path: "/register",
+    element: (
+      <Public>
+        <Register />
+      </Public>
+    ),
+  },
 
-    {
-        path: "/login",
-        element: (
-                <Login />
-          
-        )
-    }
+  {
+    path: "/login",
+    element: (
+      <Public>
+        <Login />
+      </Public>
+    ),
+  },
 ]);

@@ -13,6 +13,7 @@ const Register = () => {
         email: "",
         password: ""
     });
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,10 +27,32 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        await handleRegister(formData);
-        console.log("user Register Successfully........")
+        const newErrors = {};
+        if (!formData.username.trim()) newErrors.username = "Username is required";
+        if (!formData.email.trim()) {
+            newErrors.email = "Email is required";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = "Email is invalid";
+        }
+        if (!formData.password) {
+            newErrors.password = "Password is required";
+        } else if (formData.password.length < 6) {
+            newErrors.password = "Password must be at least 6 characters";
+        }
 
-        navigate("/")
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+        setErrors({});
+
+        try {
+            await handleRegister(formData);
+            console.log("user Register Successfully........");
+            navigate("/");
+        } catch (error) {
+            console.error(error);
+        }
     }
 
 
@@ -42,32 +65,41 @@ const Register = () => {
                 </h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <input
-                        type="text"
-                        name="username"
-                        placeholder="Username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border-b border-zinc-700 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430]"
-                    />
+                    <div>
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            className={`w-full bg-transparent border-b py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430] ${errors.username ? 'border-red-500' : 'border-zinc-700'}`}
+                        />
+                        {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+                    </div>
 
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border-b border-zinc-700 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430]"
-                    />
+                    <div>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className={`w-full bg-transparent border-b py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430] ${errors.email ? 'border-red-500' : 'border-zinc-700'}`}
+                        />
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    </div>
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border-b border-zinc-700 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430]"
-                    />
+                    <div>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className={`w-full bg-transparent border-b py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430] ${errors.password ? 'border-red-500' : 'border-zinc-700'}`}
+                        />
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    </div>
 
                     <button
                         type="submit"

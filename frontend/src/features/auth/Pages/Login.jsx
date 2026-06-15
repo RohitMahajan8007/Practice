@@ -1,8 +1,11 @@
 import { useAuth } from "../Hooks/useAuth.jsx";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import { useSelector } from "react-redux";
 
 const Login = () => {
+
+ 
     const { handleLogin } = useAuth();
     const navigate = useNavigate();
 
@@ -10,6 +13,7 @@ const Login = () => {
         email: "",
         password: "",
     });
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -23,11 +27,27 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const newErrors = {};
+        if (!formData.email.trim()) {
+            newErrors.email = "Email is required";
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = "Email is invalid";
+        }
+        if (!formData.password) {
+            newErrors.password = "Password is required";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+        setErrors({});
+
         try {
             await handleLogin(formData);
 
             console.log("User Login Successfully...");
-            navigate("/");
+            navigate("/products");
         } catch (error) {
             console.error(error);
         }
@@ -41,23 +61,29 @@ const Login = () => {
                 </h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border-b border-zinc-700 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430]"
-                    />
+                    <div>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className={`w-full bg-transparent border-b py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430] ${errors.email ? 'border-red-500' : 'border-zinc-700'}`}
+                        />
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    </div>
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border-b border-zinc-700 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430]"
-                    />
+                    <div>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className={`w-full bg-transparent border-b py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#F4C430] ${errors.password ? 'border-red-500' : 'border-zinc-700'}`}
+                        />
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    </div>
 
                     <button
                         type="submit"

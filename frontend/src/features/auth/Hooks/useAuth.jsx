@@ -17,9 +17,9 @@ export const useAuth = () => {
   async function handleLogin({ email, password }) {
     const response = await login({ email, password });
 
-    dispatch(setUser(data.user));
+    dispatch(setUser(response.user));
 
-    return data;
+    return response;
   }
 
   return { handleRegister, handleLogin };
