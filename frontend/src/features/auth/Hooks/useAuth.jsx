@@ -1,34 +1,26 @@
 import { data } from "react-router";
-import { setUser ,setLoading , setError } from "../auth.slice.js";
+import { setUser, setLoading, setError } from "../auth.slice.js";
 import { login, register } from "../Services/Auth.api.jsx";
 import { useDispatch } from "react-redux";
 
+export const useAuth = () => {
+  const dispatch = useDispatch();
 
+  async function handleRegister({ username, email, password }) {
+    const data = await register({ email, username, password });
 
-export const useAuth = ()=>{
+    dispatch(setUser(data.user));
 
-    const dispatch = useDispatch();
-    
-    
-    async function handleRegister({username , email , password}) {
+    return data;
+  }
 
-        const data = await register({email , username , password})
+  async function handleLogin({ email, password }) {
+    const response = await login({ email, password });
 
-        dispatch(setUser(data.user));
+    dispatch(setUser(data.user));
 
-        return data
-        
-    }
+    return data;
+  }
 
-    async function handleLogin({email , password}) {
-        
-        const response = await login({email , password});
-
-        dispatch(setUser(data.user));
-
-        return data
-    }
-
-
-    return {handleRegister, handleLogin}
-}
+  return { handleRegister, handleLogin };
+};
